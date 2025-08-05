@@ -1,0 +1,12 @@
+[project]
+name = "py-reranker"
+version = "0.1.0"
+description = "A comparison of various reranker models"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=1.13.0",
+    "transformers>=4.30.0",
+    "sentence-transformers>=2.2.0",
+    "einops>=0.6.0",
+]
