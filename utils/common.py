@@ -1,0 +1,92 @@
+"""
+Common utility functions for the py-reranker project
+"""
+
+import json
+import torch
+from rerankers.jina_reranker import JinaReranker
+from rerankers.mxbai_reranker import MxbaiReranker
+from rerankers.qwen_reranker import QwenReranker
+from rerankers.msmarco_reranker import MSMarcoReranker
+from rerankers.bge_reranker import BGEReranker
+
+def load_test_data(test_file):
+    """Load test data from JSON file"""
+    with open(test_file, 'r') as f:
+        data = json.load(f)
+    return data['query'], data['documents']
+
+def test_reranker(reranker, name, query, documents, top_k=3):
+    """Test a reranker and print results"""
+    print(f"\n=== {name} Results ===")
+    try:
+        if name == "Mixedbread AI Reranker":
+            results = reranker.rank(query, documents, top_k=top_k)
+            for i, result in enumerate(results):
+                print(f"{i+1}. Score: {result['score']:.4f}")
+                print(f"   Document: {result['text'][:100]}{'...' if len(result['text']) > 100 else ''}")
+        else:
+            results = reranker.rank(query, documents, top_n=top_k)
+            for i, (doc, score) in enumerate(results):
+                print(f"{i+1}. Score: {score:.4f}")
+                print(f"   Document: {doc[:100]}{'...' if len(doc) > 100 else ''}")
+    except Exception as e:
+        print(f"Error testing {name}: {str(e)}")
+
+def initialize_rerankers(device='cpu'):
+    """Initialize all rerankers"""
+    rerankers = {}
+    
+    try:
+        rerankers["Jina Reranker"] = JinaReranker(device=device)
+    except Exception as e:
+        print(f"Error initializing Jina Reranker: {str(e)}")
+    
+    try:
+        rerankers["Mixedbread AI Reranker"] = MxbaiReranker()
+    except Exception as e:
+        print(f"Error initializing Mixedbread AI Reranker: {str(e)}")
+    
+    try:
+        rerankers["Qwen Reranker"] = QwenReranker(device=device)
+    except Exception as e:
+        print(f"Error initializing Qwen Reranker: {str(e)}")
+    
+    try:
+        rerankers["MS MARCO Reranker"] = MSMarcoReranker(device=device)
+    except Exception as e:
+        print(f"Error initializing MS MARCO Reranker: {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker"] = BGEReranker(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker: {str(e)}")
+    
+    return rerankers
+
+def get_device():
+    """Determine device to use for computation"""
+    return 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def benchmark_reranker(reranker, name, query, documents):
+    """Benchmark a reranker and return timing and results"""
+    import time
+    print(f"\nBenchmarking {name}...")
+    start_time = time.time()
+    
+    try:
+        if name == "Mixedbread AI Reranker":
+            results = reranker.rank(query, documents, top_k=3)
+        else:
+            results = reranker.rank(query, documents, top_n=3)
+        
+        end_time = time.time()
+        execution_time = end_time - start_time
+        
+        print(f"  Execution time: {execution_time:.4f} seconds")
+        print(f"  Top result score: {results[0][1] if name != 'Mixedbread AI Reranker' else results[0]['score']:.4f}")
+        
+        return execution_time
+    except Exception as e:
+        print(f"  Error: {str(e)}")
+        return None
