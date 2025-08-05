@@ -38,13 +38,19 @@ uv run python main.py --query "What is the capital of France?" --documents "Pari
 To test all rerankers with all test files:
 
 ```bash
-uv run python test_all.py
+uv run python scripts/test_all.py
 ```
 
-To benchmark the performance of all rerankers:
+To test all rerankers with a specific test file:
 
 ```bash
-uv run python benchmark.py
+uv run python scripts/test_rerankers.py --test-file tests/test_qa.json
+```
+
+To benchmark the performance of all rerankers with a specific test file:
+
+```bash
+uv run python scripts/benchmark.py --test-file tests/test_qa.json
 ```
 
 ## Project Structure
@@ -52,9 +58,11 @@ uv run python benchmark.py
 - `rerankers/` - Contains implementations for each reranker model
 - `tests/` - Contains test data in JSON format
 - `main.py` - CLI interface for testing rerankers
-- `test_all.py` - Comprehensive test script
-- `test_rerankers.py` - Simple test script
-- `benchmark.py` - Performance benchmarking script
+- `scripts/` - Contains test and benchmark scripts
+  - `benchmark.py` - Performance benchmarking script
+  - `test_all.py` - Comprehensive test script
+  - `test_rerankers.py` - Simple test script
+- `utils/` - Common utility functions
 - `RESULTS.md` - Detailed results summary
 
 ## Dependencies

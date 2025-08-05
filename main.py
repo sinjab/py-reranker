@@ -1,38 +1,17 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
 import os
 import sys
-import torch
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from utils.common import load_test_data, test_reranker, initialize_rerankers, get_device
+
+# For backward compatibility, we still need these imports for the reranker_map
 from rerankers.jina_reranker import JinaReranker
 from rerankers.mxbai_reranker import MxbaiReranker
 from rerankers.qwen_reranker import QwenReranker
 from rerankers.msmarco_reranker import MSMarcoReranker
 from rerankers.bge_reranker import BGEReranker
-
-def load_test_data(test_file):
-    """Load test data from JSON file"""
-    with open(test_file, 'r') as f:
-        data = json.load(f)
-    return data['query'], data['documents']
-
-def test_reranker(reranker, name, query, documents, top_k=3):
-    """Test a reranker and print results"""
-    print(f"\n=== {name} Results ===")
-    try:
-        if name == "Mixedbread AI Reranker":
-            results = reranker.rank(query, documents, top_k=top_k)
-            for i, result in enumerate(results):
-                print(f"{i+1}. Score: {result['score']:.4f}")
-                print(f"   Document: {result['text'][:100]}{'...' if len(result['text']) > 100 else ''}")
-        else:
-            results = reranker.rank(query, documents, top_n=top_k)
-            for i, (doc, score) in enumerate(results):
-                print(f"{i+1}. Score: {score:.4f}")
-                print(f"   Document: {doc[:100]}{'...' if len(doc) > 100 else ''}")
-    except Exception as e:
-        print(f"Error testing {name}: {str(e)}")
 
 def main():
     parser = argparse.ArgumentParser(description='Test various reranker models')
@@ -46,7 +25,7 @@ def main():
     args = parser.parse_args()
     
     # Determine device
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = get_device()
     print(f"Using device: {device}")
     
     # Get query and documents
@@ -84,12 +63,10 @@ def main():
             print(f"Error initializing {name}: {str(e)}")
     else:
         # Test all rerankers
-        for name, factory in reranker_map.values():
-            try:
-                reranker = factory()
+        rerankers = initialize_rerankers(device)
+        for name, reranker in rerankers.items():
+            if reranker is not None:  # Only test if initialization was successful
                 test_reranker(reranker, name, query, documents, args.top_k)
-            except Exception as e:
-                print(f"Error initializing {name}: {str(e)}")
 
 if __name__ == "__main__":
     main()
