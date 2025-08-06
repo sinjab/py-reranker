@@ -17,7 +17,7 @@ def load_test_data(test_file):
         data = json.load(f)
     return data['query'], data['documents']
 
-def test_reranker(reranker, name, query, documents, top_k=3):
+def run_reranker_test(reranker, name, query, documents, top_k=3):
     """Test a reranker and print results"""
     print(f"\n=== {name} Results ===")
     try:

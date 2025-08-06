@@ -11,3 +11,9 @@ dependencies = [
     "einops>=0.6.0",
     "mxbai-rerank",
 ]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]

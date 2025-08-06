@@ -4,7 +4,7 @@ import argparse
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from utils.common import load_test_data, test_reranker, initialize_rerankers, get_device
+from utils.common import load_test_data, run_reranker_test, initialize_rerankers, get_device, benchmark_reranker
 
 # For backward compatibility, we still need these imports for the reranker_map
 from rerankers.jina_reranker import JinaReranker
@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'msmarco', 'bge'], 
                         help='Specific reranker to use (default: all)')
     parser.add_argument('--top-k', type=int, default=3, help='Number of top results to return')
+    parser.add_argument('--benchmark', action='store_true', help='Run performance benchmark instead of normal ranking')
     
     args = parser.parse_args()
     
@@ -55,12 +56,48 @@ def main():
         'bge': ('BGE Reranker', lambda: BGEReranker(device=device))
     }
     
-    if args.reranker:
+    if args.benchmark:
+        # Run benchmark mode
+        benchmark_results = {}
+        
+        if args.reranker:
+            # Benchmark only specified reranker
+            name, factory = reranker_map[args.reranker]
+            try:
+                reranker = factory()
+                time_taken = benchmark_reranker(reranker, name, query, documents)
+                if time_taken:
+                    benchmark_results[name] = time_taken
+            except Exception as e:
+                print(f"Error initializing {name}: {str(e)}")
+        else:
+            # Benchmark all rerankers
+            rerankers = initialize_rerankers(device)
+            for name, reranker in rerankers.items():
+                if reranker is not None:
+                    time_taken = benchmark_reranker(reranker, name, query, documents)
+                    if time_taken:
+                        benchmark_results[name] = time_taken
+        
+        # Print benchmark summary
+        if benchmark_results:
+            print("\n" + "="*50)
+            print("BENCHMARK SUMMARY")
+            print("="*50)
+            
+            # Sort by execution time
+            sorted_results = sorted(benchmark_results.items(), key=lambda x: x[1])
+            
+            print("\nReranker Performance (fastest to slowest):")
+            for i, (name, time_taken) in enumerate(sorted_results, 1):
+                print(f"  {i}. {name}: {time_taken:.4f} seconds")
+    
+    elif args.reranker:
         # Test only specified reranker
         name, factory = reranker_map[args.reranker]
         try:
             reranker = factory()
-            test_reranker(reranker, name, query, documents, args.top_k)
+            run_reranker_test(reranker, name, query, documents, args.top_k)
         except Exception as e:
             print(f"Error initializing {name}: {str(e)}")
     else:
@@ -68,7 +105,7 @@ def main():
         rerankers = initialize_rerankers(device)
         for name, reranker in rerankers.items():
             if reranker is not None:  # Only test if initialization was successful
-                test_reranker(reranker, name, query, documents, args.top_k)
+                run_reranker_test(reranker, name, query, documents, args.top_k)
 
 if __name__ == "__main__":
     main()
