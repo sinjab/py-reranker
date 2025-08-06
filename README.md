@@ -134,14 +134,14 @@ Create JSON files with the following structure:
 
 #### Benchmark Performance
 ```bash
-# Performance benchmarking with timing analysis (integrated in main CLI)
+# Performance benchmarking with timing analysis
 uv run python main.py --benchmark --test-file tests/data/test_qa.json
 
 # Benchmark specific reranker
 uv run python main.py --benchmark --reranker mxbai-v2 --test-file tests/data/test_ml.json
 
-# Or use the standalone benchmark script
-uv run python scripts/benchmark.py --test-file tests/data/test_qa.json
+# Benchmark all rerankers with inline query/documents
+uv run python main.py --benchmark --query "What is machine learning?" --documents "ML is AI" "Deep learning uses neural networks"
 ```
 
 ## 🧪 Testing
@@ -174,13 +174,12 @@ py-reranker/
 │   ├── qwen_reranker.py
 │   ├── msmarco_reranker.py
 │   └── bge_reranker.py
-├── 📁 tests/               # Test suite and test data
-│   ├── data/               # JSON test files
+├── 📁 tests/               # Test suite
+│   ├── 📁 data/            # JSON test files
+│   ├── conftest.py
 │   ├── test_main.py
 │   ├── test_utils.py
 │   └── test_rerankers.py
-├── 📁 scripts/             # Utility scripts
-│   └── benchmark.py        # Performance benchmarking
 ├── test-all.sh             # Shell script for batch testing
 ├── 📁 utils/               # Common utilities
 │   └── common.py

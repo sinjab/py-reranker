@@ -7,6 +7,8 @@ wheels/
 *.egg-info
 .python-version
 .coverage*
+htmlcov/
+.pytest_cache/
 
 # Virtual environments
 .venv
