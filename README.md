@@ -6,6 +6,7 @@ This project provides implementations and comparisons of various reranker models
 
 1. **Jina Reranker** - `jinaai/jina-reranker-v2-base-multilingual`
 2. **Mixedbread AI Reranker** - `mixedbread-ai/mxbai-rerank-large-v1`
+3. **Mixedbread AI Reranker V2** - `mixedbread-ai/mxbai-rerank-large-v2`
 3. **Qwen Reranker** - `Qwen/Qwen3-Reranker-4B`
 4. **MS MARCO Reranker** - `cross-encoder/ms-marco-MiniLM-L12-v2`
 5. **BGE Reranker** - `BAAI/bge-reranker-v2-m3`
@@ -28,6 +29,9 @@ uv run python main.py --test-file tests/test_qa.json
 
 # Test a specific reranker
 uv run python main.py --test-file tests/test_qa.json --reranker mxbai
+
+# Test the new Mixedbread AI Reranker V2
+uv run python main.py --test-file tests/test_qa.json --reranker mxbai-v2
 
 # Test with inline query and documents
 uv run python main.py --query "What is the capital of France?" --documents "Paris is the capital of France." "London is the capital of England." "Berlin is the capital of Germany."

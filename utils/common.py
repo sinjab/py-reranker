@@ -6,6 +6,7 @@ import json
 import torch
 from rerankers.jina_reranker import JinaReranker
 from rerankers.mxbai_reranker import MxbaiReranker
+from rerankers import MxbaiRerankV2
 from rerankers.qwen_reranker import QwenReranker
 from rerankers.msmarco_reranker import MSMarcoReranker
 from rerankers.bge_reranker import BGEReranker
@@ -25,6 +26,11 @@ def test_reranker(reranker, name, query, documents, top_k=3):
             for i, result in enumerate(results):
                 print(f"{i+1}. Score: {result['score']:.4f}")
                 print(f"   Document: {result['text'][:100]}{'...' if len(result['text']) > 100 else ''}")
+        elif name == "Mixedbread AI Reranker V2":
+            results = reranker.rank(query, documents, top_k=top_k)
+            for i, (doc, score) in enumerate(results):
+                print(f"{i+1}. Score: {score:.4f}")
+                print(f"   Document: {doc[:100]}{'...' if len(doc) > 100 else ''}")
         else:
             results = reranker.rank(query, documents, top_n=top_k)
             for i, (doc, score) in enumerate(results):
@@ -46,6 +52,11 @@ def initialize_rerankers(device='cpu'):
         rerankers["Mixedbread AI Reranker"] = MxbaiReranker()
     except Exception as e:
         print(f"Error initializing Mixedbread AI Reranker: {str(e)}")
+    
+    try:
+        rerankers["Mixedbread AI Reranker V2"] = MxbaiRerankV2()
+    except Exception as e:
+        print(f"Error initializing Mixedbread AI Reranker V2: {str(e)}")
     
     try:
         rerankers["Qwen Reranker"] = QwenReranker(device=device)
@@ -76,6 +87,8 @@ def benchmark_reranker(reranker, name, query, documents):
     
     try:
         if name == "Mixedbread AI Reranker":
+            results = reranker.rank(query, documents, top_k=3)
+        elif name == "Mixedbread AI Reranker V2":
             results = reranker.rank(query, documents, top_k=3)
         else:
             results = reranker.rank(query, documents, top_n=3)

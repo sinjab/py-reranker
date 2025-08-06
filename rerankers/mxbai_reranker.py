@@ -13,6 +13,7 @@ class MxbaiReranker:
             model_name (str): The name of the model to use
         """
         self.model = CrossEncoder(model_name)
+        self.model_name = model_name
     
     def rank(self, query, documents, top_k=None, return_documents=True):
         """
