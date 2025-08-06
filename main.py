@@ -6,20 +6,23 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from utils.common import load_test_data, run_reranker_test, initialize_rerankers, get_device, benchmark_reranker
 
-# For backward compatibility, we still need these imports for the reranker_map
-from rerankers.jina_reranker import JinaReranker
-from rerankers.mxbai_reranker import MxbaiReranker
-from rerankers import MxbaiRerankV2
-from rerankers.qwen_reranker import QwenReranker
-from rerankers.msmarco_reranker import MSMarcoReranker
-from rerankers.bge_reranker import BGEReranker
+# Import rerankers
+from rerankers import (
+    JinaReranker,
+    MxbaiReranker,
+    MxbaiRerankV2,
+    QwenReranker,
+    MSMarcoReranker,
+    MSMarcoRerankerV2,
+    BGEReranker
+)
 
 def main():
     parser = argparse.ArgumentParser(description='Test various reranker models')
     parser.add_argument('--test-file', type=str, help='Path to JSON test file')
     parser.add_argument('--query', type=str, help='Query string (if not using test file)')
     parser.add_argument('--documents', type=str, nargs='+', help='Document strings (if not using test file)')
-    parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'msmarco', 'bge'], 
+    parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'msmarco', 'msmarco-v2', 'bge'], 
                         help='Specific reranker to use (default: all)')
     parser.add_argument('--top-k', type=int, default=3, help='Number of top results to return')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmark instead of normal ranking')
@@ -53,6 +56,7 @@ def main():
         'mxbai-v2': ('Mixedbread AI Reranker V2', lambda: MxbaiRerankV2()),
         'qwen': ('Qwen Reranker', lambda: QwenReranker(device=device)),
         'msmarco': ('MS MARCO Reranker', lambda: MSMarcoReranker(device=device)),
+        'msmarco-v2': ('MS MARCO Reranker V2', lambda: MSMarcoRerankerV2(device=device)),
         'bge': ('BGE Reranker', lambda: BGEReranker(device=device))
     }
     

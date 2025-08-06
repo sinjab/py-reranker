@@ -4,12 +4,15 @@ Common utility functions for the py-reranker project
 
 import json
 import torch
-from rerankers.jina_reranker import JinaReranker
-from rerankers.mxbai_reranker import MxbaiReranker
-from rerankers import MxbaiRerankV2
-from rerankers.qwen_reranker import QwenReranker
-from rerankers.msmarco_reranker import MSMarcoReranker
-from rerankers.bge_reranker import BGEReranker
+from rerankers import (
+    JinaReranker,
+    MxbaiReranker,
+    MxbaiRerankV2,
+    QwenReranker,
+    MSMarcoReranker,
+    MSMarcoRerankerV2,
+    BGEReranker
+)
 
 def load_test_data(test_file):
     """Load test data from JSON file"""
@@ -67,6 +70,11 @@ def initialize_rerankers(device='cpu'):
         rerankers["MS MARCO Reranker"] = MSMarcoReranker(device=device)
     except Exception as e:
         print(f"Error initializing MS MARCO Reranker: {str(e)}")
+    
+    try:
+        rerankers["MS MARCO Reranker V2"] = MSMarcoRerankerV2(device=device)
+    except Exception as e:
+        print(f"Error initializing MS MARCO Reranker V2: {str(e)}")
     
     try:
         rerankers["BGE Reranker"] = BGEReranker(device=device)
