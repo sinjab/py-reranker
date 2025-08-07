@@ -14,7 +14,13 @@ from rerankers import (
     QwenReranker8B,
     MSMarcoReranker,
     MSMarcoRerankerV2,
-    BGEReranker
+    BGEReranker,
+    BGERerankerBase,
+    BGERerankerLarge,
+    BGERerankerV2M3,
+    BGERerankerV2Gemma,
+    BGERerankerV2MiniCPMLayerwise,
+    BGERerankerV25Gemma2Lightweight
 )
 
 def load_test_data(test_file):
@@ -95,9 +101,39 @@ def initialize_rerankers(device='cpu'):
         print(f"Error initializing MS MARCO Reranker V2: {str(e)}")
     
     try:
-        rerankers["BGE Reranker"] = BGEReranker(device=device)
+        rerankers["BGE Reranker V2-M3"] = BGEReranker(device=device)
     except Exception as e:
-        print(f"Error initializing BGE Reranker: {str(e)}")
+        print(f"Error initializing BGE Reranker V2-M3: {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker Base"] = BGERerankerBase(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker Base: {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker Large"] = BGERerankerLarge(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker Large: {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker V2-M3 (Class)"] = BGERerankerV2M3(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker V2-M3 (Class): {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker V2-Gemma"] = BGERerankerV2Gemma(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker V2-Gemma: {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker V2-MiniCPM-Layerwise"] = BGERerankerV2MiniCPMLayerwise(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker V2-MiniCPM-Layerwise: {str(e)}")
+    
+    try:
+        rerankers["BGE Reranker V2.5-Gemma2-Lightweight"] = BGERerankerV25Gemma2Lightweight(device=device)
+    except Exception as e:
+        print(f"Error initializing BGE Reranker V2.5-Gemma2-Lightweight: {str(e)}")
     
     return rerankers
 

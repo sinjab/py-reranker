@@ -17,7 +17,13 @@ from rerankers import (
     QwenReranker8B,
     MSMarcoReranker,
     MSMarcoRerankerV2,
-    BGEReranker
+    BGEReranker,
+    BGERerankerBase,
+    BGERerankerLarge,
+    BGERerankerV2M3,
+    BGERerankerV2Gemma,
+    BGERerankerV2MiniCPMLayerwise,
+    BGERerankerV25Gemma2Lightweight
 )
 
 def main():
@@ -25,7 +31,7 @@ def main():
     parser.add_argument('--test-file', type=str, help='Path to JSON test file')
     parser.add_argument('--query', type=str, help='Query string (if not using test file)')
     parser.add_argument('--documents', type=str, nargs='+', help='Document strings (if not using test file)')
-    parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'qwen-0.6b', 'qwen-4b', 'qwen-8b', 'msmarco', 'msmarco-v2', 'bge'], 
+    parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'qwen-0.6b', 'qwen-4b', 'qwen-8b', 'msmarco', 'msmarco-v2', 'bge', 'bge-base', 'bge-large', 'bge-v2-m3', 'bge-v2-gemma', 'bge-v2-minicpm-layerwise', 'bge-v2.5-gemma2-lightweight'], 
                         help='Specific reranker to use (default: all)')
     parser.add_argument('--top-k', type=int, default=3, help='Number of top results to return')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmark instead of normal ranking')
@@ -63,7 +69,13 @@ def main():
         'qwen-8b': ('Qwen Reranker 8B', lambda: QwenReranker8B(device=device)),
         'msmarco': ('MS MARCO Reranker', lambda: MSMarcoReranker(device=device)),
         'msmarco-v2': ('MS MARCO Reranker V2', lambda: MSMarcoRerankerV2(device=device)),
-        'bge': ('BGE Reranker', lambda: BGEReranker(device=device))
+        'bge': ('BGE Reranker V2-M3', lambda: BGEReranker(device=device)),
+        'bge-base': ('BGE Reranker Base', lambda: BGERerankerBase(device=device)),
+        'bge-large': ('BGE Reranker Large', lambda: BGERerankerLarge(device=device)),
+        'bge-v2-m3': ('BGE Reranker V2-M3', lambda: BGERerankerV2M3(device=device)),
+        'bge-v2-gemma': ('BGE Reranker V2-Gemma', lambda: BGERerankerV2Gemma(device=device)),
+        'bge-v2-minicpm-layerwise': ('BGE Reranker V2-MiniCPM-Layerwise', lambda: BGERerankerV2MiniCPMLayerwise(device=device)),
+        'bge-v2.5-gemma2-lightweight': ('BGE Reranker V2.5-Gemma2-Lightweight', lambda: BGERerankerV25Gemma2Lightweight(device=device))
     }
     
     if args.benchmark:

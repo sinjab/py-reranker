@@ -172,8 +172,14 @@ def test_run_reranker_test_exception(mock_print):
 @patch('utils.common.QwenReranker8B')
 @patch('utils.common.MSMarcoReranker')
 @patch('utils.common.MSMarcoRerankerV2')
+@patch('utils.common.BGERerankerV25Gemma2Lightweight')
+@patch('utils.common.BGERerankerV2MiniCPMLayerwise')
+@patch('utils.common.BGERerankerV2Gemma')
+@patch('utils.common.BGERerankerV2M3')
+@patch('utils.common.BGERerankerLarge')
+@patch('utils.common.BGERerankerBase')
 @patch('utils.common.BGEReranker')
-def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, mock_qwen_8b, mock_qwen_4b, mock_qwen_0_6b, mock_qwen, mock_mxbai_v2, mock_mxbai, mock_jina, mock_print):
+def test_initialize_rerankers_success(mock_bge, mock_bge_base, mock_bge_large, mock_bge_v2m3, mock_bge_v2gemma, mock_bge_v2minicpm, mock_bge_v25lightweight, mock_msmarco_v2, mock_msmarco, mock_qwen_8b, mock_qwen_4b, mock_qwen_0_6b, mock_qwen, mock_mxbai_v2, mock_mxbai, mock_jina, mock_print):
     """Test initialize_rerankers function with successful initialization"""
     # Mock all rerankers to return mock instances
     mock_instances = {
@@ -186,7 +192,13 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
         'qwen_8b': MagicMock(),
         'msmarco': MagicMock(),
         'msmarco_v2': MagicMock(),
-        'bge': MagicMock()
+        'bge': MagicMock(),
+        'bge_base': MagicMock(),
+        'bge_large': MagicMock(),
+        'bge_v2m3': MagicMock(),
+        'bge_v2gemma': MagicMock(),
+        'bge_v2minicpm': MagicMock(),
+        'bge_v25lightweight': MagicMock()
     }
     
     mock_jina.return_value = mock_instances['jina']
@@ -199,12 +211,18 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
     mock_msmarco.return_value = mock_instances['msmarco']
     mock_msmarco_v2.return_value = mock_instances['msmarco_v2']
     mock_bge.return_value = mock_instances['bge']
+    mock_bge_base.return_value = mock_instances['bge_base']
+    mock_bge_large.return_value = mock_instances['bge_large']
+    mock_bge_v2m3.return_value = mock_instances['bge_v2m3']
+    mock_bge_v2gemma.return_value = mock_instances['bge_v2gemma']
+    mock_bge_v2minicpm.return_value = mock_instances['bge_v2minicpm']
+    mock_bge_v25lightweight.return_value = mock_instances['bge_v25lightweight']
     
     device = 'cpu'
     rerankers = initialize_rerankers(device)
     
     # Verify all rerankers were initialized
-    assert len(rerankers) == 10
+    assert len(rerankers) == 16
     assert "Jina Reranker" in rerankers
     assert "Mixedbread AI Reranker" in rerankers
     assert "Mixedbread AI Reranker V2" in rerankers
@@ -214,7 +232,13 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
     assert "Qwen Reranker 8B" in rerankers
     assert "MS MARCO Reranker" in rerankers
     assert "MS MARCO Reranker V2" in rerankers
-    assert "BGE Reranker" in rerankers
+    assert "BGE Reranker V2-M3" in rerankers
+    assert "BGE Reranker Base" in rerankers
+    assert "BGE Reranker Large" in rerankers
+    assert "BGE Reranker V2-M3 (Class)" in rerankers
+    assert "BGE Reranker V2-Gemma" in rerankers
+    assert "BGE Reranker V2-MiniCPM-Layerwise" in rerankers
+    assert "BGE Reranker V2.5-Gemma2-Lightweight" in rerankers
     
     # Verify device-dependent rerankers were called with device
     mock_jina.assert_called_once_with(device=device)
@@ -225,6 +249,12 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
     mock_msmarco.assert_called_once_with(device=device)
     mock_msmarco_v2.assert_called_once_with(device=device)
     mock_bge.assert_called_once_with(device=device)
+    mock_bge_base.assert_called_once_with(device=device)
+    mock_bge_large.assert_called_once_with(device=device)
+    mock_bge_v2m3.assert_called_once_with(device=device)
+    mock_bge_v2gemma.assert_called_once_with(device=device)
+    mock_bge_v2minicpm.assert_called_once_with(device=device)
+    mock_bge_v25lightweight.assert_called_once_with(device=device)
     
     # Verify device-independent rerankers were called without device
     mock_mxbai.assert_called_once_with()

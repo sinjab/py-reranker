@@ -213,7 +213,7 @@ def test_main_with_bge_reranker(mock_print, mock_bge_class, mock_test_reranker, 
     # Verify function calls
     mock_get_device.assert_called_once()
     mock_bge_class.assert_called_once_with(device='cpu')
-    mock_test_reranker.assert_called_once_with(mock_bge_instance, 'BGE Reranker', 'test query', ['doc1'], 3)
+    mock_test_reranker.assert_called_once_with(mock_bge_instance, 'BGE Reranker V2-M3', 'test query', ['doc1'], 3)
 
 
 @patch('main.get_device')

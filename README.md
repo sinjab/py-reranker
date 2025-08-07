@@ -8,7 +8,7 @@ A comprehensive Python library for testing and comparing state-of-the-art rerank
 
 ## ✨ Features
 
-- 🚀 **6 State-of-the-art Rerankers** - Compare leading models in one place
+- 🚀 **14 State-of-the-art Rerankers** - Compare leading models in one place
 - 🎯 **Unified API** - Consistent interface across all models
 - 📊 **Comprehensive Testing** - 97% test coverage with robust validation
 - 🌍 **Multilingual Support** - Test with multiple languages
@@ -27,7 +27,12 @@ A comprehensive Python library for testing and comparing state-of-the-art rerank
 | **Qwen Reranker 4B** | Alibaba | `Qwen/Qwen3-Reranker-4B` | Balanced size and quality |
 | **Qwen Reranker 8B** | Alibaba | `Qwen/Qwen3-Reranker-8B` | Largest, highest accuracy |
 | **MS MARCO** | Microsoft | `cross-encoder/ms-marco-MiniLM-L12-v2` | Fast, well-established |
-| **BGE Reranker** | BAAI | `BAAI/bge-reranker-v2-m3` | Multilingual, research-grade |
+| **BGE Base** | BAAI | `BAAI/bge-reranker-base` | Fast, lightweight baseline |
+| **BGE Large** | BAAI | `BAAI/bge-reranker-large` | Larger, more accurate |
+| **BGE V2-M3** | BAAI | `BAAI/bge-reranker-v2-m3` | Latest multilingual model |
+| **BGE V2-Gemma** | BAAI | `BAAI/bge-reranker-v2-gemma` | LLM-based reranker |
+| **BGE V2-MiniCPM-Layerwise** | BAAI | `BAAI/bge-reranker-v2-minicpm-layerwise` | Advanced layerwise model |
+| **BGE V2.5-Gemma2-Lightweight** | BAAI | `BAAI/bge-reranker-v2.5-gemma2-lightweight` | Lightweight LLM reranker* |
 
 ## 🚀 Quick Start
 
@@ -108,6 +113,147 @@ Number of documents: 3
    Document: The weather today is sunny.
 ```
 
+### 🎯 BGE Model Variants
+
+The BGE (BAAI General Embedding) rerankers offer multiple model sizes and architectures:
+
+| Model | CLI Option | Model Size | Type | Best For |
+|-------|------------|------------|------|----------|
+| **BGE Base** | `bge-base` | ~110M params | Standard | Fast inference, baseline |
+| **BGE Large** | `bge-large` | ~340M params | Standard | Better accuracy |
+| **BGE V2-M3** | `bge-v2-m3` | 568M params | Standard | Multilingual, lightweight, fast inference |
+| **BGE V2-Gemma** | `bge-v2-gemma` | 2.51B params | LLM-based | Multilingual, strong performance |
+| **BGE V2-MiniCPM-Layerwise** | `bge-v2-minicpm-layerwise` | 2.72B params | Layerwise | Layer selection, accelerated inference |
+| **BGE V2.5-Gemma2-Lightweight** | `bge-v2.5-gemma2-lightweight` | 2.72B params | Lightweight LLM | Layer selection, compression, efficiency* |
+
+#### Model Selection Guide
+
+**Choose your BGE model based on your requirements:**
+
+- **For multilingual contexts**: Use `bge-v2-m3`, `bge-v2-gemma`, or `bge-v2.5-gemma2-lightweight`
+- **For Chinese or English**: Use `bge-v2-m3` or `bge-v2-minicpm-layerwise`
+- **For efficiency**: Use `bge-v2-m3` or low layers of `bge-v2-minicpm-layerwise`
+- **For best performance**: Use `bge-v2-minicpm-layerwise` or `bge-v2-gemma`
+
+> 💡 **Tip**: Always test on your real use case and choose the model with the best speed-quality balance!
+
+#### BGE Usage Examples
+
+```bash
+# Fast baseline model
+uv run python main.py \
+  --query "What is machine learning?" \
+  --documents "ML is AI subset" "Deep learning uses neural networks" \
+  --reranker bge-base
+
+# High accuracy model
+uv run python main.py \
+  --query "What is machine learning?" \
+  --documents "ML is AI subset" "Deep learning uses neural networks" \
+  --reranker bge-large
+
+# Latest multilingual model (default BGE)
+uv run python main.py \
+  --query "What is machine learning?" \
+  --documents "ML is AI subset" "Deep learning uses neural networks" \
+  --reranker bge-v2-m3
+
+# LLM-based reranker for complex queries
+uv run python main.py \
+  --query "Explain the relationship between neural networks and deep learning" \
+  --documents "Neural networks are the foundation" "Deep learning uses multiple layers" \
+  --reranker bge-v2-gemma
+
+# Lightweight LLM reranker (requires newer transformers)
+uv run python main.py \
+  --query "What is machine learning?" \
+  --documents "ML is AI subset" "Deep learning uses neural networks" \
+  --reranker bge-v2.5-gemma2-lightweight
+```
+
+#### Programmatic BGE Usage
+
+```python
+from rerankers import (
+    BGEReranker,           # Generic class with model_size parameter
+    BGERerankerBase,       # Convenience class for base model
+    BGERerankerLarge,      # Convenience class for large model
+    BGERerankerV2M3,       # Convenience class for V2-M3 model
+    BGERerankerV2Gemma,    # Convenience class for V2-Gemma model
+    BGERerankerV2MiniCPMLayerwise,  # Convenience class for layerwise model
+    BGERerankerV25Gemma2Lightweight  # Convenience class for lightweight model
+)
+
+# Method 1: Using generic class with model_size parameter
+reranker = BGEReranker(model_size='base')  # or 'large', 'v2-m3', 'v2-gemma', 'v2-minicpm-layerwise', 'v2.5-gemma2-lightweight'
+
+# Method 2: Using convenience classes
+base_reranker = BGERerankerBase()
+large_reranker = BGERerankerLarge()
+v2m3_reranker = BGERerankerV2M3()
+gemma_reranker = BGERerankerV2Gemma(use_bf16=True)  # Enable bf16 for faster inference
+layerwise_reranker = BGERerankerV2MiniCPMLayerwise()  # Uses bf16 by default
+lightweight_reranker = BGERerankerV25Gemma2Lightweight()  # Requires newer transformers
+
+# Compute scores
+query = "What is machine learning?"
+documents = [
+    "Machine learning is a subset of artificial intelligence",
+    "Deep learning uses neural networks with multiple layers",
+    "The weather today is sunny"
+]
+
+scores = base_reranker.compute_score(query, documents)
+print(f"Base model scores: {scores}")
+
+# Rank documents
+ranked = large_reranker.rank(query, documents, top_n=2)
+for i, (doc, score) in enumerate(ranked, 1):
+    print(f"{i}. Score: {score:.4f} - {doc[:50]}...")
+
+# For layerwise model, you can specify which layers to use
+layerwise_scores = layerwise_reranker.compute_score(
+    query, documents, cutoff_layers=[28]  # Use layer 28 for scoring
+)
+
+# For lightweight model, you can specify compression parameters
+try:
+    lightweight_scores = lightweight_reranker.compute_score(
+        query, documents, 
+        cutoff_layers=[28], 
+        compress_ratio=2, 
+        compress_layer=[24, 40]
+    )
+except ImportError as e:
+    print(f"Lightweight model requires newer transformers: {e}")
+```
+
+#### Alternative: Official FlagEmbedding Usage
+
+If you prefer to use the official FlagEmbedding library directly (requires `pip install -U FlagEmbedding`):
+
+```python
+from FlagEmbedding import FlagReranker, FlagLLMReranker, LayerWiseFlagLLMReranker, LightWeightFlagLLMReranker
+
+# Standard models (bge-reranker-v2-m3, bge-reranker-base, bge-reranker-large)
+reranker = FlagReranker('BAAI/bge-reranker-v2-m3', use_fp16=True)
+score = reranker.compute_score(['query', 'passage'])
+
+# LLM-based model (bge-reranker-v2-gemma)
+llm_reranker = FlagLLMReranker('BAAI/bge-reranker-v2-gemma', use_fp16=True)
+score = llm_reranker.compute_score(['query', 'passage'])
+
+# Layerwise model (bge-reranker-v2-minicpm-layerwise)
+layerwise_reranker = LayerWiseFlagLLMReranker('BAAI/bge-reranker-v2-minicpm-layerwise', use_fp16=True)
+score = layerwise_reranker.compute_score(['query', 'passage'], cutoff_layers=[28])
+
+# Lightweight model (bge-reranker-v2.5-gemma2-lightweight)
+lightweight_reranker = LightWeightFlagLLMReranker('BAAI/bge-reranker-v2.5-gemma2-lightweight', use_fp16=True)
+score = lightweight_reranker.compute_score(['query', 'passage'], cutoff_layers=[28], compress_ratio=2, compress_layer=[24, 40])
+```
+
+> **Note**: Our implementation uses transformers directly for better compatibility and unified API, but both approaches produce equivalent results.
+
 ## 📖 Detailed Usage
 
 ### Command Line Interface
@@ -121,7 +267,7 @@ Options:
   --test-file PATH              Path to JSON test file
   --query TEXT                  Query string (alternative to test file)
   --documents TEXT [TEXT ...]   Document strings to rank
-  --reranker {jina,mxbai,mxbai-v2,qwen,qwen-0.6b,qwen-4b,qwen-8b,msmarco,msmarco-v2,bge}
+  --reranker {jina,mxbai,mxbai-v2,qwen,qwen-0.6b,qwen-4b,qwen-8b,msmarco,msmarco-v2,bge,bge-base,bge-large,bge-v2-m3,bge-v2-gemma,bge-v2-minicpm-layerwise,bge-v2.5-gemma2-lightweight}
                                Specific reranker to use (default: all)
   --top-k INTEGER              Number of top results to return (default: 3)
   --benchmark                  Run performance benchmark instead of normal ranking
@@ -251,6 +397,13 @@ Based on our benchmarking tests:
 - **PyTorch**: Latest stable version
 - **Transformers**: Latest stable version
 - **Additional**: See `pyproject.toml` for complete dependencies
+
+### Model-Specific Requirements
+
+- **BGE V2.5-Gemma2-Lightweight**: Requires the latest transformers version (>= 4.45.0) for compatibility with Gemma2 architecture. If you encounter import errors, upgrade transformers:
+  ```bash
+  pip install --upgrade transformers
+  ```
 
 ## 🌟 Use Cases
 
