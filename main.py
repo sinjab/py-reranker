@@ -12,6 +12,9 @@ from rerankers import (
     MxbaiReranker,
     MxbaiRerankV2,
     QwenReranker,
+    QwenReranker0_6B,
+    QwenReranker4B,
+    QwenReranker8B,
     MSMarcoReranker,
     MSMarcoRerankerV2,
     BGEReranker
@@ -22,7 +25,7 @@ def main():
     parser.add_argument('--test-file', type=str, help='Path to JSON test file')
     parser.add_argument('--query', type=str, help='Query string (if not using test file)')
     parser.add_argument('--documents', type=str, nargs='+', help='Document strings (if not using test file)')
-    parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'msmarco', 'msmarco-v2', 'bge'], 
+    parser.add_argument('--reranker', type=str, choices=['jina', 'mxbai', 'mxbai-v2', 'qwen', 'qwen-0.6b', 'qwen-4b', 'qwen-8b', 'msmarco', 'msmarco-v2', 'bge'], 
                         help='Specific reranker to use (default: all)')
     parser.add_argument('--top-k', type=int, default=3, help='Number of top results to return')
     parser.add_argument('--benchmark', action='store_true', help='Run performance benchmark instead of normal ranking')
@@ -54,7 +57,10 @@ def main():
         'jina': ('Jina Reranker', lambda: JinaReranker(device=device)),
         'mxbai': ('Mixedbread AI Reranker', lambda: MxbaiReranker()),
         'mxbai-v2': ('Mixedbread AI Reranker V2', lambda: MxbaiRerankV2()),
-        'qwen': ('Qwen Reranker', lambda: QwenReranker(device=device)),
+        'qwen': ('Qwen Reranker 4B', lambda: QwenReranker(device=device)),
+        'qwen-0.6b': ('Qwen Reranker 0.6B', lambda: QwenReranker0_6B(device=device)),
+        'qwen-4b': ('Qwen Reranker 4B', lambda: QwenReranker4B(device=device)),
+        'qwen-8b': ('Qwen Reranker 8B', lambda: QwenReranker8B(device=device)),
         'msmarco': ('MS MARCO Reranker', lambda: MSMarcoReranker(device=device)),
         'msmarco-v2': ('MS MARCO Reranker V2', lambda: MSMarcoRerankerV2(device=device)),
         'bge': ('BGE Reranker', lambda: BGEReranker(device=device))

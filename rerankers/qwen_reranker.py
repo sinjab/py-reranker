@@ -1,19 +1,35 @@
 """
 Qwen Reranker Implementation
+
+Supports multiple Qwen3-Reranker model sizes:
+- Qwen/Qwen3-Reranker-0.6B (fastest, smaller)
+- Qwen/Qwen3-Reranker-4B (default, balanced)
+- Qwen/Qwen3-Reranker-8B (largest, most accurate)
 """
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 class QwenReranker:
-    def __init__(self, model_name='Qwen/Qwen3-Reranker-4B', device='cpu'):
+    def __init__(self, model_name='Qwen/Qwen3-Reranker-4B', device='cpu', model_size=None):
         """
         Initialize the Qwen Reranker
         
         Args:
             model_name (str): The name of the model to use
             device (str): The device to run the model on ('cpu' or 'cuda')
+            model_size (str): Model size shorthand ('0.6b', '4b', '8b'). If provided, overrides model_name
         """
+        # Handle model size shortcuts
+        if model_size:
+            size_map = {
+                '0.6b': 'Qwen/Qwen3-Reranker-0.6B',
+                '4b': 'Qwen/Qwen3-Reranker-4B', 
+                '8b': 'Qwen/Qwen3-Reranker-8B'
+            }
+            model_name = size_map.get(model_size.lower(), model_name)
+        
+        self.model_name = model_name
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side='left')
         self.model = AutoModelForCausalLM.from_pretrained(model_name).eval()
         self.device = device
@@ -24,9 +40,9 @@ class QwenReranker:
         self.token_true_id = self.tokenizer.convert_tokens_to_ids("yes")
         self.max_length = 8192
         
-        # Prefix and suffix tokens
-        prefix = "\n\n\nJudge whether the Document meets the requirements based on the Query and the Instruct provided. Note that the answer can only be \"yes\" or \"no\".\n\n\n\n"
-        suffix = "\n\n\n\n\n\n\n\n"
+        # Updated prefix and suffix tokens based on the official examples
+        prefix = "<|im_start|>system\nJudge whether the Document meets the requirements based on the Query and the Instruct provided. Note that the answer can only be \"yes\" or \"no\".<|im_end|>\n<|im_start|>user\n"
+        suffix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
         self.prefix_tokens = self.tokenizer.encode(prefix, add_special_tokens=False)
         self.suffix_tokens = self.tokenizer.encode(suffix, add_special_tokens=False)
     
@@ -112,3 +128,22 @@ class QwenReranker:
         if top_n:
             return ranked[:top_n]
         return ranked
+
+
+# Convenience classes for different model sizes
+class QwenReranker0_6B(QwenReranker):
+    """Qwen3-Reranker-0.6B - Fastest, smallest model"""
+    def __init__(self, device='cpu'):
+        super().__init__(model_name='Qwen/Qwen3-Reranker-0.6B', device=device)
+
+
+class QwenReranker4B(QwenReranker):
+    """Qwen3-Reranker-4B - Default, balanced model"""
+    def __init__(self, device='cpu'):
+        super().__init__(model_name='Qwen/Qwen3-Reranker-4B', device=device)
+
+
+class QwenReranker8B(QwenReranker):
+    """Qwen3-Reranker-8B - Largest, most accurate model"""
+    def __init__(self, device='cpu'):
+        super().__init__(model_name='Qwen/Qwen3-Reranker-8B', device=device)

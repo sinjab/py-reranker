@@ -167,10 +167,13 @@ def test_run_reranker_test_exception(mock_print):
 @patch('utils.common.MxbaiReranker')
 @patch('utils.common.MxbaiRerankV2')
 @patch('utils.common.QwenReranker')
+@patch('utils.common.QwenReranker0_6B')
+@patch('utils.common.QwenReranker4B')
+@patch('utils.common.QwenReranker8B')
 @patch('utils.common.MSMarcoReranker')
 @patch('utils.common.MSMarcoRerankerV2')
 @patch('utils.common.BGEReranker')
-def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, mock_qwen, mock_mxbai_v2, mock_mxbai, mock_jina, mock_print):
+def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, mock_qwen_8b, mock_qwen_4b, mock_qwen_0_6b, mock_qwen, mock_mxbai_v2, mock_mxbai, mock_jina, mock_print):
     """Test initialize_rerankers function with successful initialization"""
     # Mock all rerankers to return mock instances
     mock_instances = {
@@ -178,6 +181,9 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
         'mxbai': MagicMock(),
         'mxbai_v2': MagicMock(),
         'qwen': MagicMock(),
+        'qwen_0_6b': MagicMock(),
+        'qwen_4b': MagicMock(),
+        'qwen_8b': MagicMock(),
         'msmarco': MagicMock(),
         'msmarco_v2': MagicMock(),
         'bge': MagicMock()
@@ -187,6 +193,9 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
     mock_mxbai.return_value = mock_instances['mxbai']
     mock_mxbai_v2.return_value = mock_instances['mxbai_v2']
     mock_qwen.return_value = mock_instances['qwen']
+    mock_qwen_0_6b.return_value = mock_instances['qwen_0_6b']
+    mock_qwen_4b.return_value = mock_instances['qwen_4b']
+    mock_qwen_8b.return_value = mock_instances['qwen_8b']
     mock_msmarco.return_value = mock_instances['msmarco']
     mock_msmarco_v2.return_value = mock_instances['msmarco_v2']
     mock_bge.return_value = mock_instances['bge']
@@ -195,11 +204,14 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
     rerankers = initialize_rerankers(device)
     
     # Verify all rerankers were initialized
-    assert len(rerankers) == 7
+    assert len(rerankers) == 10
     assert "Jina Reranker" in rerankers
     assert "Mixedbread AI Reranker" in rerankers
     assert "Mixedbread AI Reranker V2" in rerankers
-    assert "Qwen Reranker" in rerankers
+    assert "Qwen Reranker 4B" in rerankers
+    assert "Qwen Reranker 4B (explicit)" in rerankers
+    assert "Qwen Reranker 0.6B" in rerankers
+    assert "Qwen Reranker 8B" in rerankers
     assert "MS MARCO Reranker" in rerankers
     assert "MS MARCO Reranker V2" in rerankers
     assert "BGE Reranker" in rerankers
@@ -207,6 +219,9 @@ def test_initialize_rerankers_success(mock_bge, mock_msmarco_v2, mock_msmarco, m
     # Verify device-dependent rerankers were called with device
     mock_jina.assert_called_once_with(device=device)
     mock_qwen.assert_called_once_with(device=device)
+    mock_qwen_0_6b.assert_called_once_with(device=device)
+    mock_qwen_4b.assert_called_once_with(device=device)
+    mock_qwen_8b.assert_called_once_with(device=device)
     mock_msmarco.assert_called_once_with(device=device)
     mock_msmarco_v2.assert_called_once_with(device=device)
     mock_bge.assert_called_once_with(device=device)

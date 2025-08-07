@@ -171,7 +171,7 @@ def test_main_with_qwen_reranker(mock_print, mock_qwen_class, mock_test_reranker
     # Verify function calls
     mock_get_device.assert_called_once()
     mock_qwen_class.assert_called_once_with(device='cpu')
-    mock_test_reranker.assert_called_once_with(mock_qwen_instance, 'Qwen Reranker', 'test query', ['doc1'], 3)
+    mock_test_reranker.assert_called_once_with(mock_qwen_instance, 'Qwen Reranker 4B', 'test query', ['doc1'], 3)
 
 
 @patch('main.get_device')
@@ -379,3 +379,66 @@ def test_main_benchmark_all_rerankers(mock_print, mock_init_rerankers, mock_benc
     # Verify benchmark summary was printed
     summary_calls = [call for call in mock_print.call_args_list if 'BENCHMARK SUMMARY' in str(call)]
     assert len(summary_calls) > 0
+
+
+@patch('main.get_device')
+@patch('main.run_reranker_test')
+@patch('main.QwenReranker0_6B')
+@patch('builtins.print')
+def test_main_with_qwen_0_6b_reranker(mock_print, mock_qwen_class, mock_test_reranker, mock_get_device):
+    """Test main function with QwenReranker0_6B"""
+    # Setup mocks
+    mock_get_device.return_value = 'cpu'
+    mock_qwen_instance = MagicMock()
+    mock_qwen_class.return_value = mock_qwen_instance
+    
+    # Mock sys.argv for qwen-0.6b reranker
+    with patch('sys.argv', ['main.py', '--query', 'test query', '--documents', 'doc1', '--reranker', 'qwen-0.6b']):
+        main.main()
+    
+    # Verify function calls
+    mock_get_device.assert_called_once()
+    mock_qwen_class.assert_called_once_with(device='cpu')
+    mock_test_reranker.assert_called_once_with(mock_qwen_instance, 'Qwen Reranker 0.6B', 'test query', ['doc1'], 3)
+
+
+@patch('main.get_device')
+@patch('main.run_reranker_test')
+@patch('main.QwenReranker4B')
+@patch('builtins.print')
+def test_main_with_qwen_4b_reranker(mock_print, mock_qwen_class, mock_test_reranker, mock_get_device):
+    """Test main function with QwenReranker4B"""
+    # Setup mocks
+    mock_get_device.return_value = 'cpu'
+    mock_qwen_instance = MagicMock()
+    mock_qwen_class.return_value = mock_qwen_instance
+    
+    # Mock sys.argv for qwen-4b reranker
+    with patch('sys.argv', ['main.py', '--query', 'test query', '--documents', 'doc1', '--reranker', 'qwen-4b']):
+        main.main()
+    
+    # Verify function calls
+    mock_get_device.assert_called_once()
+    mock_qwen_class.assert_called_once_with(device='cpu')
+    mock_test_reranker.assert_called_once_with(mock_qwen_instance, 'Qwen Reranker 4B', 'test query', ['doc1'], 3)
+
+
+@patch('main.get_device')
+@patch('main.run_reranker_test')
+@patch('main.QwenReranker8B')
+@patch('builtins.print')
+def test_main_with_qwen_8b_reranker(mock_print, mock_qwen_class, mock_test_reranker, mock_get_device):
+    """Test main function with QwenReranker8B"""
+    # Setup mocks
+    mock_get_device.return_value = 'cpu'
+    mock_qwen_instance = MagicMock()
+    mock_qwen_class.return_value = mock_qwen_instance
+    
+    # Mock sys.argv for qwen-8b reranker
+    with patch('sys.argv', ['main.py', '--query', 'test query', '--documents', 'doc1', '--reranker', 'qwen-8b']):
+        main.main()
+    
+    # Verify function calls
+    mock_get_device.assert_called_once()
+    mock_qwen_class.assert_called_once_with(device='cpu')
+    mock_test_reranker.assert_called_once_with(mock_qwen_instance, 'Qwen Reranker 8B', 'test query', ['doc1'], 3)

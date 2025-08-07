@@ -23,7 +23,9 @@ A comprehensive Python library for testing and comparing state-of-the-art rerank
 | **Jina Reranker** | Jina AI | `jinaai/jina-reranker-v2-base-multilingual` | Fast inference, multilingual |
 | **MixedBread AI v1** | MixedBread AI | `mixedbread-ai/mxbai-rerank-large-v1` | Balanced performance |
 | **MixedBread AI v2** | MixedBread AI | `mixedbread-ai/mxbai-rerank-large-v2` | Latest generation, high accuracy |
-| **Qwen Reranker** | Alibaba | `Qwen/Qwen3-Reranker-4B` | Large model, excellent quality |
+| **Qwen Reranker 0.6B** | Alibaba | `Qwen/Qwen3-Reranker-0.6B` | Fastest, smallest model |
+| **Qwen Reranker 4B** | Alibaba | `Qwen/Qwen3-Reranker-4B` | Balanced size and quality |
+| **Qwen Reranker 8B** | Alibaba | `Qwen/Qwen3-Reranker-8B` | Largest, highest accuracy |
 | **MS MARCO** | Microsoft | `cross-encoder/ms-marco-MiniLM-L12-v2` | Fast, well-established |
 | **BGE Reranker** | BAAI | `BAAI/bge-reranker-v2-m3` | Multilingual, research-grade |
 
@@ -71,6 +73,23 @@ uv run python main.py \
     "Neural networks are powerful" \
   --reranker mxbai-v2 \
   --top-k 2
+
+# Test different Qwen model sizes
+uv run python main.py \
+  --query "What is machine learning?" \
+  --documents \
+    "AI is machine intelligence" \
+    "Cooking is an art" \
+    "Neural networks are powerful" \
+  --reranker qwen-0.6b  # Fastest Qwen model
+
+uv run python main.py \
+  --query "What is machine learning?" \
+  --documents \
+    "AI is machine intelligence" \
+    "Cooking is an art" \
+    "Neural networks are powerful" \
+  --reranker qwen-8b    # Most accurate Qwen model
 ```
 
 ### Example Output
@@ -102,7 +121,7 @@ Options:
   --test-file PATH              Path to JSON test file
   --query TEXT                  Query string (alternative to test file)
   --documents TEXT [TEXT ...]   Document strings to rank
-  --reranker {jina,mxbai,mxbai-v2,qwen,msmarco,bge}
+  --reranker {jina,mxbai,mxbai-v2,qwen,qwen-0.6b,qwen-4b,qwen-8b,msmarco,msmarco-v2,bge}
                                Specific reranker to use (default: all)
   --top-k INTEGER              Number of top results to return (default: 3)
   --benchmark                  Run performance benchmark instead of normal ranking

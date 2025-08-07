@@ -9,6 +9,9 @@ from rerankers import (
     MxbaiReranker,
     MxbaiRerankV2,
     QwenReranker,
+    QwenReranker0_6B,
+    QwenReranker4B,
+    QwenReranker8B,
     MSMarcoReranker,
     MSMarcoRerankerV2,
     BGEReranker
@@ -62,9 +65,24 @@ def initialize_rerankers(device='cpu'):
         print(f"Error initializing Mixedbread AI Reranker V2: {str(e)}")
     
     try:
-        rerankers["Qwen Reranker"] = QwenReranker(device=device)
+        rerankers["Qwen Reranker 4B"] = QwenReranker(device=device)
     except Exception as e:
-        print(f"Error initializing Qwen Reranker: {str(e)}")
+        print(f"Error initializing Qwen Reranker 4B: {str(e)}")
+    
+    try:
+        rerankers["Qwen Reranker 4B (explicit)"] = QwenReranker4B(device=device)
+    except Exception as e:
+        print(f"Error initializing Qwen Reranker 4B (explicit): {str(e)}")
+    
+    try:
+        rerankers["Qwen Reranker 0.6B"] = QwenReranker0_6B(device=device)
+    except Exception as e:
+        print(f"Error initializing Qwen Reranker 0.6B: {str(e)}")
+    
+    try:
+        rerankers["Qwen Reranker 8B"] = QwenReranker8B(device=device)
+    except Exception as e:
+        print(f"Error initializing Qwen Reranker 8B: {str(e)}")
     
     try:
         rerankers["MS MARCO Reranker"] = MSMarcoReranker(device=device)
